@@ -36,7 +36,7 @@
 #include "EntityGroup.h"
 #include "Set.h"
 
-FourthExampleOfSimulation::FourthExampleOfSimulation() {
+FourthExampleOfSimulation::CollectorApp() {
 }
 
 int FourthExampleOfSimulation::main(int argc, char** argv) {

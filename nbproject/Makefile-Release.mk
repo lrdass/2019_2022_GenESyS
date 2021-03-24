@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/Assign.o \
 	${OBJECTDIR}/Attribute.o \
 	${OBJECTDIR}/BaseConsoleGenesysApplication.o \
+	${OBJECTDIR}/CollectorApp.o \
 	${OBJECTDIR}/CollectorDatafileDefaultImpl1.o \
 	${OBJECTDIR}/CollectorDefaultImpl1.o \
 	${OBJECTDIR}/ComponentManager.o \
@@ -160,11 +161,11 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesysincludingkernel
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesys
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesysincludingkernel: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesys: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesysincludingkernel ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/genesys ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 ${OBJECTDIR}/Assign.o: Assign.cpp nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}
@@ -180,6 +181,11 @@ ${OBJECTDIR}/BaseConsoleGenesysApplication.o: BaseConsoleGenesysApplication.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BaseConsoleGenesysApplication.o BaseConsoleGenesysApplication.cpp
+
+${OBJECTDIR}/CollectorApp.o: CollectorApp.cpp nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/CollectorApp.o CollectorApp.cpp
 
 ${OBJECTDIR}/CollectorDatafileDefaultImpl1.o: CollectorDatafileDefaultImpl1.cpp nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}

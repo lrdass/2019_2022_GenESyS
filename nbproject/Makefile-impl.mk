@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=GenESySIncludingKernel
+PROJECTNAME=genesys
 
 # Active Configuration
 DEFAULTCONF=Debug

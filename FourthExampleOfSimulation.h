@@ -18,7 +18,7 @@
 
 class FourthExampleOfSimulation : public BaseConsoleGenesysApplication {
 public:
-	FourthExampleOfSimulation();
+	CollectorApp();
 public:
 	virtual int main(int argc, char** argv);
 };

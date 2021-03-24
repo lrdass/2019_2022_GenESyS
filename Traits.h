@@ -76,6 +76,8 @@
 //#include "TestMarkovChain.h"
 #include "TestMatricesOfAttributesAndVariables.h"
 
+#include "CollectorApp.h"
+
 template <typename T>
 struct Traits {
 };
@@ -98,10 +100,11 @@ template <> struct Traits<GenesysApplication_if> {
 	//typedef FirstExampleOfSimulation Application;
 	//typedef SecondExampleOfSimulation Application;
 	//typedef ThirdExampleOfSimulation Application;
-	typedef FourthExampleOfSimulation Application;
-	//typedef FullSimulationOfComplexModel Application;
+	//typedef FourthExampleOfSimulation Application;
+        //typedef FullSimulationOfComplexModel Application;
 	// full aplications
 	//typedef GenesysGUI Application;
+    typedef CollectorApp Application;
 };
 
 /*
