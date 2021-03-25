@@ -15,6 +15,8 @@
 #define COLLECTORAPP_H
 #include "BaseConsoleGenesysApplication.h"
 #include "iostream"
+#include "StatisticsDefaultImpl1.h"
+#include "Collector_if.h"
 
 class CollectorApp : public BaseConsoleGenesysApplication {
 public:

@@ -19,30 +19,35 @@
 class StatisticsDataFileDummyImpl : public StatisticsDatafile_if {
 public:
 	StatisticsDataFileDummyImpl();
-	virtual ~StatisticsDataFileDummyImpl() = default;
+	~StatisticsDataFileDummyImpl() = default;
 public:
-	virtual Collector_if* getCollector();
+	Collector_if* getCollector();
 	void setCollector(Collector_if* collector);
 public:
-	virtual unsigned int numElements();
-	virtual double min();
-	virtual double max();
-	virtual double average();
-	virtual double variance();
-	virtual double stddeviation();
-	virtual double variationCoef();
-	virtual double halfWidthConfidenceInterval(double confidencelevel);
-	virtual unsigned int newSampleSize(double confidencelevel, double halfWidth);
+	unsigned int numElements();
+	double min();
+	double max();
+	double average();
+	double variance();
+	double stddeviation();
+	double variationCoef();
+	double halfWidthConfidenceInterval();
 
-	virtual double mode();
-	virtual double mediane();
-	virtual double quartil(unsigned short num);
-	virtual double decil(unsigned short num);
-	virtual double centil(unsigned short num);
-	virtual void setHistogramNumClasses(unsigned short num);
-	virtual unsigned short histogramNumClasses();
-	virtual double histogramClassLowerLimit(unsigned short classNum);
-	virtual unsigned int histogramClassFrequency(unsigned short classNum);
+	double mode();
+	double mediane();
+	double quartil(unsigned short num);
+	double decil(unsigned short num);
+	double centil(unsigned short num);
+	void setHistogramNumClasses(unsigned short num);
+	unsigned short histogramNumClasses();
+	double histogramClassLowerLimit(unsigned short classNum);
+	unsigned int histogramClassFrequency(unsigned short classNum);
+        
+	unsigned int newSampleSize(double halfWidth);
+        
+	double getConfidenceLevel();
+	void setConfidenceLevel(double confidencelevel);
+        
 private:
 	Collector_if* _collector;
 };

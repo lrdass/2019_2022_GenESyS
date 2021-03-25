@@ -16,7 +16,7 @@
 #include "Traits.h"
 
 StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
-	_collector = new Traits<Statistics_if>::CollectorImplementation();
+	_collector = new Traits<Statistics_if>::CollectorDatafileImplementation();
 }
 
 unsigned int StatisticsDataFileDummyImpl::numElements() {
@@ -32,7 +32,7 @@ double StatisticsDataFileDummyImpl::max() {
 }
 
 double StatisticsDataFileDummyImpl::average() {
-
+    return 0.0;
 }
 
 double StatisticsDataFileDummyImpl::mode() {
@@ -55,11 +55,11 @@ double StatisticsDataFileDummyImpl::variationCoef() {
 	return 0.0; // dummy
 }
 
-double StatisticsDataFileDummyImpl::halfWidthConfidenceInterval(double confidencelevel) {
+double StatisticsDataFileDummyImpl::halfWidthConfidenceInterval() {
 	return 0.0; // dummy
 }
 
-unsigned int StatisticsDataFileDummyImpl::newSampleSize(double confidencelevel, double halfWidth) {
+unsigned int StatisticsDataFileDummyImpl::newSampleSize(double halfWidth) {
 	return 0; // dummy
 }
 
@@ -76,6 +76,7 @@ double StatisticsDataFileDummyImpl::centil(unsigned short num) {
 }
 
 void StatisticsDataFileDummyImpl::setHistogramNumClasses(unsigned short num) {
+    std::cout << "teste" << std::endl;
 }
 
 unsigned short StatisticsDataFileDummyImpl::histogramNumClasses() {
@@ -95,5 +96,15 @@ Collector_if* StatisticsDataFileDummyImpl::getCollector() {
 }
 
 void StatisticsDataFileDummyImpl::setCollector(Collector_if* collector) {
-
+    _collector = collector;
 }
+
+double StatisticsDataFileDummyImpl::getConfidenceLevel(){
+    return 0.0;
+};
+void StatisticsDataFileDummyImpl::setConfidenceLevel(double confidencelevel){
+    
+}
+
+
+

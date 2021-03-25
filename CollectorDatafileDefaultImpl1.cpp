@@ -14,12 +14,18 @@
 #include "CollectorDatafileDefaultImpl1.h"
 
 CollectorDatafileDefaultImpl1::CollectorDatafileDefaultImpl1() {
+    auto timestamp = std::time(0);
+    _filename = "default_" + std::to_string(timestamp) + ".txt";
 }
 
 void CollectorDatafileDefaultImpl1::clear() {
 }
 
 void CollectorDatafileDefaultImpl1::addValue(double value) {
+    std::ofstream inputFile;
+    inputFile.open(_filename, std::ofstream::out);
+    inputFile << value;
+    inputFile.close();
 }
 
 double CollectorDatafileDefaultImpl1::getLastValue() {
@@ -50,7 +56,7 @@ void CollectorDatafileDefaultImpl1::setDataFilename(std::string filename) {
 }
 
 void CollectorDatafileDefaultImpl1::setAddValueHandler(CollectorAddValueHandler addValueHandler) {
-
+    
 }
 
 void CollectorDatafileDefaultImpl1::setClearHandler(CollectorClearHandler clearHandler) {

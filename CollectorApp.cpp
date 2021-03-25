@@ -12,11 +12,17 @@
  */
 
 #include "CollectorApp.h"
+#include "StatisticsDataFileDefaultImpl.h"
 
 CollectorApp::CollectorApp() {
 }
 
-CollectorApp::main(int argc, char** argv) {
+int CollectorApp::main(int argc, char** argv) {
     std::cout << "Teste" << std::endl;
+    
+    StatisticsDataFileDummyImpl* imp = new StatisticsDataFileDummyImpl();
+    
+    Collector_if* collector = imp->getCollector();
+    collector->addValue(1);
 }
 

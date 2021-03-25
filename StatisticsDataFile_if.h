@@ -28,6 +28,11 @@ public:
 	virtual unsigned short histogramNumClasses() = 0;
 	virtual double histogramClassLowerLimit(unsigned short classNum) = 0;
 	virtual unsigned int histogramClassFrequency(unsigned short classNum) = 0;
+        
+        virtual double halfWidthConfidenceInterval() = 0;
+	virtual unsigned int newSampleSize(double halfWidth) = 0;
+	virtual double getConfidenceLevel() = 0;
+	virtual void setConfidenceLevel(double confidencelevel) = 0;
 
 };
 

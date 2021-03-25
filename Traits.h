@@ -162,6 +162,7 @@ template <> struct Traits<Collector_if> {
 template <> struct Traits<Statistics_if> {
 	typedef StatisticsDefaultImpl1 Implementation;
 	typedef CollectorDefaultImpl1 CollectorImplementation;
+        typedef CollectorDatafileDefaultImpl1 CollectorDatafileImplementation;
 	static constexpr double SignificanceLevel = 0.05;
 };
 

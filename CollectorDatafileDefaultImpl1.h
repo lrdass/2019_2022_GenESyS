@@ -15,7 +15,8 @@
 #define COLLECTORDATAFILEDEFAULTIMPL1_H
 
 #include <string>
-
+#include <fstream>
+#include<ctime>
 #include "CollectorDatafile_if.h"
 
 class CollectorDatafileDefaultImpl1 : public CollectorDatafile_if {
