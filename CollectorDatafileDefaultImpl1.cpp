@@ -62,3 +62,8 @@ void CollectorDatafileDefaultImpl1::setAddValueHandler(CollectorAddValueHandler 
 void CollectorDatafileDefaultImpl1::setClearHandler(CollectorClearHandler clearHandler) {
 
 }
+
+void CollectorDatafileDefaultImpl1::sortFileInplace(){
+    std::string command = "sort -n "+_filename+" - o"+_filename;
+    return system(command);
+}

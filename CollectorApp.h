@@ -18,6 +18,9 @@
 #include "StatisticsDefaultImpl1.h"
 #include "Collector_if.h"
 
+#include "StatisticsDataFileDefaultImpl.h"
+#include "StatisticsDefaultImpl1.h"
+
 class CollectorApp : public BaseConsoleGenesysApplication {
 public:
     CollectorApp();

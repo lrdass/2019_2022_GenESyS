@@ -16,7 +16,7 @@
 #include "Traits.h"
 
 StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
-	_collector = new Traits<Statistics_if>::CollectorDatafileImplementation();
+    _collector = new Traits<Statistics_if>::CollectorDatafileImplementation();
 }
 
 unsigned int StatisticsDataFileDummyImpl::numElements() {

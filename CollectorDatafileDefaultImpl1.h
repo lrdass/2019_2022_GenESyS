@@ -19,6 +19,8 @@
 #include<ctime>
 #include "CollectorDatafile_if.h"
 
+#include <stdlib.h>
+
 class CollectorDatafileDefaultImpl1 : public CollectorDatafile_if {
 public:
 	CollectorDatafileDefaultImpl1();
@@ -38,6 +40,8 @@ public:
 	void setAddValueHandler(CollectorAddValueHandler addValueHandler);
 	void setClearHandler(CollectorClearHandler clearHandler);
 private:
+        int sortFileInplace();
+        bool fileWasSorted;
 	std::string _filename;
 };
 

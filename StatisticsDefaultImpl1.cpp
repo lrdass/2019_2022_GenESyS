@@ -53,7 +53,7 @@ void StatisticsDefaultImpl1::collectorAddHandler(double newValue) {
 	// alternative 2
 	//_average = (_average * (elems - 1) + newValue) / elems;  // this approach propagates the numeric error
 	//_variance = (_variance * (elems - 1) + pow(newValue - _average, 2)) / elems;  // this approach propagates the numeric error
-	_stddeviation = sqrt(_variance);
+	_stddeviation = std::sqrt(_variance);
 	_variationCoef = (_average != 0 ? _stddeviation / _average : 0.0);
 	_halfWidth = _criticalTn_1 * (_stddeviation / std::sqrt(_elems));
 }
