@@ -25,7 +25,9 @@ StatisticsDefaultImpl1::StatisticsDefaultImpl1() {
 	_collector = new Traits<ModelComponent>::StatisticsCollector_CollectorImplementation();
 	_collector->setAddValueHandler(setCollectorAddValueHandler(&StatisticsDefaultImpl1::collectorAddHandler, this));
 	_collector->setClearHandler(setCollectorClearHandler(&StatisticsDefaultImpl1::collectorClearHandler, this));
-	//_collector->setAddValueHandler(std::bind(&StatisticsDefaultImpl1::collectorAddHandler, this, std::placeholders::_1));
+	// nosso collector DataFile "escutar" este collector
+        
+        //_collector->setAddValueHandler(std::bind(&StatisticsDefaultImpl1::collectorAddHandler, this, std::placeholders::_1));
 	this->initStatistics();
 }
 

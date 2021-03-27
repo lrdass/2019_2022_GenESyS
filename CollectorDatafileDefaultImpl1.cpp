@@ -14,8 +14,9 @@
 #include "CollectorDatafileDefaultImpl1.h"
 
 CollectorDatafileDefaultImpl1::CollectorDatafileDefaultImpl1() {
+    wasFileSorted = false;
     auto timestamp = std::time(0);
-    _filename = "default_" + std::to_string(timestamp) + ".txt";
+    _filename = "default_" + std::to_string(timestamp) + ".dat";
 }
 
 void CollectorDatafileDefaultImpl1::clear() {
@@ -23,13 +24,17 @@ void CollectorDatafileDefaultImpl1::clear() {
 
 void CollectorDatafileDefaultImpl1::addValue(double value) {
     std::ofstream inputFile;
-    inputFile.open(_filename, std::ofstream::out);
-    inputFile << value;
+    inputFile.open(_filename, std::ios::app);
+    inputFile << value << std::endl;
     inputFile.close();
 }
 
 double CollectorDatafileDefaultImpl1::getLastValue() {
-	return 0.0; // \todo:
+    if(!wasFileSorted){
+        sortFileInplace();
+    } else{
+        return 0.0; // \todo:
+    }
 }
 
 unsigned long CollectorDatafileDefaultImpl1::numElements() {
@@ -37,7 +42,12 @@ unsigned long CollectorDatafileDefaultImpl1::numElements() {
 }
 
 double CollectorDatafileDefaultImpl1::getValue(unsigned int num) {
-	return 0.0; // \todo:
+    if(!wasFileSorted){
+        sortFileInplace();
+    } else{
+        return 0.0; // \todo:
+    }
+	
 }
 
 double CollectorDatafileDefaultImpl1::getNextValue() {
@@ -63,7 +73,13 @@ void CollectorDatafileDefaultImpl1::setClearHandler(CollectorClearHandler clearH
 
 }
 
-void CollectorDatafileDefaultImpl1::sortFileInplace(){
-    std::string command = "sort -n "+_filename+" - o"+_filename;
-    return system(command);
+int CollectorDatafileDefaultImpl1::sortFileInplace(){
+    std::string command = "sort "+_filename + " -o " + _filename;
+
+    if(system(command.c_str()) == 0){
+        wasFileSorted = true;
+        return 1;
+    } 
+    return -1;
 }
+

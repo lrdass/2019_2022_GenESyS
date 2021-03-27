@@ -12,7 +12,6 @@
  */
 
 #include "StatisticsDataFileDefaultImpl.h"
-
 #include "Traits.h"
 
 StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
@@ -105,6 +104,5 @@ double StatisticsDataFileDummyImpl::getConfidenceLevel(){
 void StatisticsDataFileDummyImpl::setConfidenceLevel(double confidencelevel){
     
 }
-
 
 

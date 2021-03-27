@@ -16,10 +16,11 @@
 
 #include <string>
 #include <fstream>
-#include<ctime>
+#include <ctime>
 #include "CollectorDatafile_if.h"
-
+#include <stdio.h>
 #include <stdlib.h>
+#include <cstring>
 
 class CollectorDatafileDefaultImpl1 : public CollectorDatafile_if {
 public:
@@ -41,7 +42,7 @@ public:
 	void setClearHandler(CollectorClearHandler clearHandler);
 private:
         int sortFileInplace();
-        bool fileWasSorted;
+        bool wasFileSorted = false;
 	std::string _filename;
 };
 

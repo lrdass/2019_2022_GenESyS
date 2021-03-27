@@ -24,6 +24,12 @@ int CollectorApp::main(int argc, char** argv) {
     Collector_if* collector = imp->getCollector();
     
     collector->addValue(1.0);
+    collector->addValue(3.0);
+    collector->addValue(1.5);
+    
+    collector->getLastValue();
+    
+
 
 }
 
