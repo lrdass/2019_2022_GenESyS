@@ -22,30 +22,51 @@ CollectorDatafileDefaultImpl1::CollectorDatafileDefaultImpl1() {
 void CollectorDatafileDefaultImpl1::clear() {
 }
 
-void CollectorDatafileDefaultImpl1::addValue(double value) {
+void CollectorDatafileDefaultImpl1::addValue(double value) { 
     std::ofstream inputFile;
-    inputFile.open(_filename, std::ios::app);
-    inputFile << value << std::endl;
+    
+    inputFile.open(_filename, std::ios::binary);
+    // dizer que o arquivo é de registros de doubles
+    // arquivo binario <double>
+    inputFile.write(reinterpret_cast<char *>(&value), sizeof(value));
     inputFile.close();
-}
-
-double CollectorDatafileDefaultImpl1::getLastValue() {
-    if(!wasFileSorted){
-        sortFileInplace();
-    } else{
-        return 0.0; // \todo:
+    
+    this->_lastValue = value;
+    this->_numElements +=1;
+    
+    if(_addValueHandler != nullptr){
+        _addValueHandler(value);
     }
 }
 
+// ultimo valor inserido
+double CollectorDatafileDefaultImpl1::getLastValue() {
+    return this->_lastValue;
+}
+
 unsigned long CollectorDatafileDefaultImpl1::numElements() {
-	return 0.0; // \todo:
+	return this->_numElements;
 }
 
 double CollectorDatafileDefaultImpl1::getValue(unsigned int num) {
     if(!wasFileSorted){
         sortFileInplace();
+        
+        std::ifstream file(_filename);
+        std::string line;
+        
+        if(file.is_open()){
+            file.seekg(-1, std::ios_base::end);
+            std::getline(file, line);
+            return std::stod(line);
+        }
+        return 0;
+        
+        
+        
     } else{
-        return 0.0; // \todo:
+        
+        return 0.0;
     }
 	
 }
@@ -74,12 +95,13 @@ void CollectorDatafileDefaultImpl1::setClearHandler(CollectorClearHandler clearH
 }
 
 int CollectorDatafileDefaultImpl1::sortFileInplace(){
+    // https://codereview.stackexchange.com/questions/135241/sort-a-binary-file-without-loading-it-into-memory-or-using-a-temporary-file
     std::string command = "sort "+_filename + " -o " + _filename;
-
+    
     if(system(command.c_str()) == 0){
         wasFileSorted = true;
-        return 1;
-    } 
+        return 0;
+    }
     return -1;
 }
 

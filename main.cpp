@@ -16,6 +16,8 @@
 #include <limits>
 #include "Traits.h"
 
+
+
 /*
  * This is the MAIN application of GenESyS. It just calls the Application specificied on the configuration file.
  */
@@ -29,5 +31,8 @@ int main(int argc, char** argv) {
 	std::cout << "Press ENTER to quit...";
 	std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
 	return res;
+    
+  	
+
 }
 

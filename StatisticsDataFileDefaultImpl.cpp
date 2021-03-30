@@ -16,10 +16,16 @@
 
 StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
     _collector = new Traits<Statistics_if>::CollectorDatafileImplementation();
+    // avisar statistics datafile
+    _collector->setAddValueHandler(setCollectorAddValueHandler(&StatisticsDataFileDummyImpl::collectorAddHandler, this));
+    _collector->setClearHandler(setCollectorClearHandler(&StatisticsDataFileDummyImpl::collectorClearHandler, this));
+    
+    
 }
 
 unsigned int StatisticsDataFileDummyImpl::numElements() {
 	return 0; // dummy
+        
 }
 
 double StatisticsDataFileDummyImpl::min() {
@@ -31,7 +37,7 @@ double StatisticsDataFileDummyImpl::max() {
 }
 
 double StatisticsDataFileDummyImpl::average() {
-    return 0.0;
+    return this->_average;
 }
 
 double StatisticsDataFileDummyImpl::mode() {
@@ -105,4 +111,20 @@ void StatisticsDataFileDummyImpl::setConfidenceLevel(double confidencelevel){
     
 }
 
+void StatisticsDataFileDummyImpl::collectorAddHandler(double newValue){
+    // do stuff with new value
+    _elems = _collector->numElements();
+    if(newValue < _min){
+        _min = newValue;
+    }
+    if(newValue> _max){
+        _max = newValue;
+    }
+    
+    _sum += newValue;
+    _average = _sum / _elems;
+}
 
+void StatisticsDataFileDummyImpl::collectorClearHandler(){
+    // do stuff to reset 
+}

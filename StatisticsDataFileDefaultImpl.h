@@ -49,7 +49,23 @@ public:
 	void setConfidenceLevel(double confidencelevel);
         
 private:
+        void collectorAddHandler(double newValue);
+        void collectorClearHandler();
+private:
 	Collector_if* _collector;
+        		
+        unsigned long _elems;
+        double _sum;
+        double _sumSquare;
+        double _min;
+        double _max;
+        double _average;
+        double _variance;
+        double _stddeviation;
+        double _variationCoef;
+        double _confidenceLevel = 0.95;
+        double _criticalTn_1 = 1.96;
+        double _halfWidth;
 };
 
 #endif /* STATISTICSDATAFILEDEFAULTIMPL_H */

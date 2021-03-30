@@ -345,11 +345,20 @@
       <compileType>
         <ccTool>
           <standard>8</standard>
-          <commandLine>-fpermissive</commandLine>
+          <incDir>
+            <pElem>libs/gmp-6.2.1</pElem>
+          </incDir>
+          <commandLine>-fpermissive -lgmp</commandLine>
         </ccTool>
         <asmTool>
           <warningLevel>2</warningLevel>
         </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>libs/gmp-6.2.1</pElem>
+          </linkerAddLib>
+          <commandLine>-lgmp</commandLine>
+        </linkerTool>
       </compileType>
       <item path="AnalysisOfVariance_if.h" ex="false" tool="3" flavor2="0">
       </item>

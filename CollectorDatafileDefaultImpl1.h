@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <iomanip>
+#include <cmath>
+#include <limits>
 
 class CollectorDatafileDefaultImpl1 : public CollectorDatafile_if {
 public:
@@ -41,9 +44,15 @@ public:
 	void setAddValueHandler(CollectorAddValueHandler addValueHandler);
 	void setClearHandler(CollectorClearHandler clearHandler);
 private:
-        int sortFileInplace();
+        
         bool wasFileSorted = false;
 	std::string _filename;
+        double _lastValue;
+        int _numElements = 0;
+private:
+        int sortFileInplace();
+        CollectorAddValueHandler _addValueHandler = nullptr;
+        CollectorClearHandler _clearHandler = nullptr;
 };
 
 #endif /* COLLECTORDATAFILEDEFAULTIMPL1_H */
