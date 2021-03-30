@@ -15,6 +15,7 @@
 
 #include "StatisticsDefaultImpl1.h"
 #include "Traits.h"
+#include <gmp.h>
 //#include "Integrator_if.h"
 //#include "ProbDistribDefaultImpl1.h"
 
@@ -48,17 +49,45 @@ void StatisticsDefaultImpl1::collectorAddHandler(double newValue) {
 		_max = newValue;
 	}
 	// alternative 1
-	_sum += newValue;
-	_sumSquare += newValue*newValue;
-	_average = _sum / _elems;
-	_variance = _sumSquare / _elems - _average*_average;
+	//_sum += newValue;
+	//_sumSquare += newValue*newValue;
+	//_average = _sum / _elems;
+	//_variance = _sumSquare / _elems - _average*_average;
 	// alternative 2
-	//_average = (_average * (elems - 1) + newValue) / elems;  // this approach propagates the numeric error
-	//_variance = (_variance * (elems - 1) + pow(newValue - _average, 2)) / elems;  // this approach propagates the numeric error
-        // retornar double
-	_stddeviation = std::sqrt(_variance);
-	_variationCoef = (_average != 0 ? _stddeviation / _average : 0.0);
-	_halfWidth = _criticalTn_1 * (_stddeviation / std::sqrt(_elems));
+	mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
+        mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
+
+        mpf_t f_average, f_variance, f_newValue, f_elems, f_aux, f_auxTwo;
+        mpf_inits(f_average, f_variance, f_newValue, f_elems, f_aux, f_auxTwo, NULL);
+        
+        mpf_set_ui(f_elems, _elems);
+        mpf_set_d(f_newValue, newValue);
+        mpf_set_d(f_average, _average);
+        
+        mpf_sub_ui(f_aux, f_elems, 1);     // aux <-              _elems - 1
+        mpf_mul(f_aux, f_average, f_aux);  // aux <-  _average * (_elems - 1)
+        mpf_add(f_aux, f_aux, f_newValue); // aux <-  _average * (_elems - 1) + newValue
+        mpf_div(f_aux, f_aux, f_elems);    // aux <- (_average * (_elems - 1) + newValue) / _elems
+        
+        _average = mpf_get_d(f_aux);       // _average <- float _average (possivel truncamento)
+        
+        //_average = (_average * (_elems - 1) + newValue) / _elems;  // this approach propagates the numeric error
+        mpf_set(f_average, f_aux); // Update f_average with new average
+	
+        mpf_sub_ui(f_aux, f_elems, 1);            // aux <-              _elems - 1
+        mpf_mul(f_aux, f_variance, f_aux);        // aux <- _variance * (_elems - 1)
+        mpf_sub(f_auxTwo, f_newValue, f_average); // auxTwo <-                             newValue - _average
+        mpf_pow_ui(f_auxTwo, f_auxTwo, 2);        // auxTwo <-                         pow(newValue - _average, 2)
+        mpf_add(f_aux, f_aux, f_auxTwo);          // aux <- _variance * (_elems - 1) + pow(newValue - _average, 2)
+        mpf_div(f_aux, f_aux, f_elems);           // aux <-(_variance * (_elems - 1) + pow(newValue - _average, 2)) / _elems
+        
+        _variance = mpf_get_d(f_aux);             // _variance <- float _variance (possivel truncamento)
+        
+        //_variance = (_variance * (_elems - 1) + pow(newValue - _average, 2)) / _elems;  // this approach propagates the numeric error
+        
+	_stddeviation = std::sqrt(_variance); // Usar f_aux para calcular o stddeviation em float
+	_variationCoef = (_average != 0 ? _stddeviation / _average : 0.0); // Precisa criar f_stddeviation e usar f_average
+	_halfWidth = _criticalTn_1 * (_stddeviation / std::sqrt(_elems)); // Mesma logica
 }
 
 void StatisticsDefaultImpl1::collectorClearHandler() {
