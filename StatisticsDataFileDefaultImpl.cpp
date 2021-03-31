@@ -24,16 +24,22 @@ StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
 }
 
 unsigned int StatisticsDataFileDummyImpl::numElements() {
-	return 0; // dummy
+	return this->getCollector()->numElements();
         
 }
 
 double StatisticsDataFileDummyImpl::min() {
-	return 0.0; // dummy
+    if (_elems > 0)
+            return _min;
+    else
+            return 0.0;
 }
 
 double StatisticsDataFileDummyImpl::max() {
-	return 0.0; // dummy
+    if (_elems > 0)
+            return _max;
+    else
+            return 0.0;
 }
 
 double StatisticsDataFileDummyImpl::average() {
@@ -41,7 +47,7 @@ double StatisticsDataFileDummyImpl::average() {
 }
 
 double StatisticsDataFileDummyImpl::mode() {
-	return 0.0; // dummy
+	return _variance; // dummy
 }
 
 double StatisticsDataFileDummyImpl::mediane() {
@@ -49,19 +55,19 @@ double StatisticsDataFileDummyImpl::mediane() {
 }
 
 double StatisticsDataFileDummyImpl::variance() {
-	return 0.0; // dummy
+	return _variance; // dummy
 }
 
 double StatisticsDataFileDummyImpl::stddeviation() {
-	return 0.0; // dummy
+	return _stddeviation; // dummy
 }
 
 double StatisticsDataFileDummyImpl::variationCoef() {
-	return 0.0; // dummy
+	return _variationCoef; // dummy
 }
 
 double StatisticsDataFileDummyImpl::halfWidthConfidenceInterval() {
-	return 0.0; // dummy
+	return _halfWidth; // dummy
 }
 
 unsigned int StatisticsDataFileDummyImpl::newSampleSize(double halfWidth) {
@@ -123,8 +129,22 @@ void StatisticsDataFileDummyImpl::collectorAddHandler(double newValue){
     
     _sum += newValue;
     _average = _sum / _elems;
+    _stddeviation = std::sqrt(_variance);
+    _variance = _sumSquare / _elems - _average*_average;
+    _variationCoef = (_average != 0 ? _stddeviation / _average : 0.0);
+    _halfWidth = _criticalTn_1 * (_stddeviation / std::sqrt(_elems));
 }
 
 void StatisticsDataFileDummyImpl::collectorClearHandler(){
     // do stuff to reset 
+    _elems = 0;
+    _min = +1e+99;
+    _max = -1e+99;
+    _sum = 0.0;
+    _sumSquare = 0.0;
+    _average = 0.0;
+    _variance = 0.0;
+    _stddeviation = 0.0;
+    _variationCoef = 0.0;
+    _halfWidth = 0.0;
 }

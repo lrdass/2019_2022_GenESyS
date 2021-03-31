@@ -16,20 +16,21 @@
 CollectorDatafileDefaultImpl1::CollectorDatafileDefaultImpl1() {
     wasFileSorted = false;
     auto timestamp = std::time(0);
-    _filename = "default_" + std::to_string(timestamp) + ".dat";
+//    _filename = "default_" + std::to_string(timestamp) + ".dat";
+    _filename = "datafile.dat";
 }
 
 void CollectorDatafileDefaultImpl1::clear() {
 }
 
 void CollectorDatafileDefaultImpl1::addValue(double value) { 
-    std::ofstream inputFile;
+    std::fstream file;
     
-    inputFile.open(_filename, std::ios::binary);
+    file.open(_filename,  std::ios::out | std::ios::app | std::ios::binary);
     // dizer que o arquivo é de registros de doubles
     // arquivo binario <double>
-    inputFile.write(reinterpret_cast<char *>(&value), sizeof(value));
-    inputFile.close();
+    file.write((const char*) &value, sizeof(value));
+    file.close();
     
     this->_lastValue = value;
     this->_numElements +=1;
