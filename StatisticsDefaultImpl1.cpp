@@ -85,9 +85,27 @@ void StatisticsDefaultImpl1::collectorAddHandler(double newValue) {
         
         //_variance = (_variance * (_elems - 1) + pow(newValue - _average, 2)) / _elems;  // this approach propagates the numeric error
         
-	_stddeviation = std::sqrt(_variance); // Usar f_aux para calcular o stddeviation em float
-	_variationCoef = (_average != 0 ? _stddeviation / _average : 0.0); // Precisa criar f_stddeviation e usar f_average
-	_halfWidth = _criticalTn_1 * (_stddeviation / std::sqrt(_elems)); // Mesma logica
+        mpf_sqrt(f_aux, f_aux);
+        _stddeviation = mpf_get_d(f_aux); //_stddeviation = std::sqrt(_variance)
+	//_stddeviation = std::sqrt(_variance); // Usar f_aux para calcular o stddeviation em float
+        
+        
+        if (_average != 0) {
+             mpf_div(f_aux, f_aux, f_average); //_stddeviation / _average
+            _variationCoef = mpf_get_d(f_aux);
+        } else {
+            _variationCoef = 0.0;
+        }
+        //_variationCoef = (_average != 0 ? _stddeviation / _average : 0.0); // Precisa criar f_stddeviation e usar f_average
+	
+        mpf_set_d(f_aux, _stddeviation);
+        mpf_sqrt(f_auxTwo, f_elems);     //                                 std::sqrt(_elems)
+        mpf_div(f_aux, f_aux, f_auxTwo); //                (_stddeviation / std::sqrt(_elems))
+        mpf_set_d(f_auxTwo, _criticalTn_1);
+        mpf_mul(f_aux, f_auxTwo, f_aux); //_criticalTn_1 * (_stddeviation / std::sqrt(_elems));
+        
+        _halfWidth = mpf_get_d(f_aux);
+        //_halfWidth = _criticalTn_1 * (_stddeviation / std::sqrt(_elems)); // Mesma logica
 }
 
 void StatisticsDefaultImpl1::collectorClearHandler() {
