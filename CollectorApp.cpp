@@ -29,7 +29,7 @@ int CollectorApp::main(int argc, char** argv) {
 //    collector->addValue(1.5);
 //    
 //    std::cout<< collector->getLastValue() << std::endl;
-    
+    /*
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
     mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
@@ -53,15 +53,15 @@ int CollectorApp::main(int argc, char** argv) {
 
     std::cout << a << std::endl;
     
+    */
+    
+    StatisticsDefaultImpl1 * statImp = new StatisticsDefaultImpl1();
+    Collector_if* coll = statImp->getCollector();
+    coll->addValue(3);
+    coll->addValue(5);
     
     
-//    StatisticsDefaultImpl1 * statImp = new StatisticsDefaultImpl1();
-//    Collector_if* coll = statImp->getCollector();
-//    coll->addValue(3);
-//    coll->addValue(5);
-//    
-//    
-//    statImp->average();
+    statImp->average();
     
     
 
