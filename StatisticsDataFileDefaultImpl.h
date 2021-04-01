@@ -15,6 +15,7 @@
 #define STATISTICSDATAFILEDEFAULTIMPL_H
 
 #include "StatisticsDataFile_if.h"
+#include "CollectorDatafile_if.h" // necessario para declarar _collector_test
 
 class StatisticsDataFileDummyImpl : public StatisticsDatafile_if {
 public:
@@ -53,6 +54,7 @@ private:
         void collectorClearHandler();
 private:
 	Collector_if* _collector;
+        CollectorDatafile_if* _collector_test;
         		
         unsigned long _elems;
         double _sum;
@@ -66,6 +68,13 @@ private:
         double _confidenceLevel = 0.95;
         double _criticalTn_1 = 1.96;
         double _halfWidth;
+        
+        unsigned short _histogramclassNum;
+        
+        bool _wasAltered_variance = false;
+        bool _wasAltered_stddeviation = false;
+        bool _wasAltered_variationCoef = false;
+        bool _wasAltered_halfWidth = false;
 };
 
 #endif /* STATISTICSDATAFILEDEFAULTIMPL_H */

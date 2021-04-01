@@ -63,6 +63,7 @@ void StatisticsDefaultImpl1::collectorAddHandler(double newValue) {
         mpf_set_ui(f_elems, _elems);
         mpf_set_d(f_newValue, newValue);
         mpf_set_d(f_average, _average);
+        mpf_set_d(f_variance, _variance);
         
         mpf_sub_ui(f_aux, f_elems, 1);     // aux <-              _elems - 1
         mpf_mul(f_aux, f_average, f_aux);  // aux <-  _average * (_elems - 1)
