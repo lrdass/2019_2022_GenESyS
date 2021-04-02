@@ -45,6 +45,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ConnectionManager.o \
 	${OBJECTDIR}/Counter.o \
 	${OBJECTDIR}/Create.o \
+	${OBJECTDIR}/DataFileArray.o \
 	${OBJECTDIR}/Decide.o \
 	${OBJECTDIR}/Delay.o \
 	${OBJECTDIR}/Dispose.o \
@@ -216,6 +217,11 @@ ${OBJECTDIR}/Create.o: Create.cpp nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Create.o Create.cpp
+
+${OBJECTDIR}/DataFileArray.o: DataFileArray.cpp nbproject/Makefile-${CND_CONF}.mk
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/DataFileArray.o DataFileArray.cpp
 
 ${OBJECTDIR}/Decide.o: Decide.cpp nbproject/Makefile-${CND_CONF}.mk
 	${MKDIR} -p ${OBJECTDIR}

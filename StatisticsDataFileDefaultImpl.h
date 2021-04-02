@@ -15,7 +15,8 @@
 #define STATISTICSDATAFILEDEFAULTIMPL_H
 
 #include "StatisticsDataFile_if.h"
-#include "CollectorDatafile_if.h" // necessario para declarar _collector_test
+#include "CollectorDatafile_if.h"
+#include "CollectorDatafileDefaultImpl1.h" // necessario para declarar _collector_test
 
 class StatisticsDataFileDummyImpl : public StatisticsDatafile_if {
 public:
@@ -54,7 +55,7 @@ private:
         void collectorClearHandler();
 private:
 	Collector_if* _collector;
-        CollectorDatafile_if* _collector_test;
+        CollectorDatafileDefaultImpl1* _collectorDatafile;
         		
         unsigned long _elems;
         double _sum;

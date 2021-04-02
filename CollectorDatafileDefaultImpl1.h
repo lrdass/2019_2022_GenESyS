@@ -18,17 +18,20 @@
 #include <fstream>
 #include <ctime>
 #include "CollectorDatafile_if.h"
+#include "CollectorDatafileDefaultImpl1.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <iomanip>
 #include <cmath>
 #include <limits>
+#include "DataFileArray.h"
 
 class CollectorDatafileDefaultImpl1 : public CollectorDatafile_if {
 public:
 	CollectorDatafileDefaultImpl1();
 	virtual ~CollectorDatafileDefaultImpl1() = default;
+        bool wasFileSorted = false;
 public: // inherited from Collector_if
 	void clear();
 	void addValue(double value);
@@ -40,17 +43,21 @@ public:
 	void seekFirstValue();
 	std::string getDataFilename();
 	void setDataFilename(std::string filename);
+        void sortFile();
+        double getValueOrdered(unsigned int num);
 public:
 	void setAddValueHandler(CollectorAddValueHandler addValueHandler);
 	void setClearHandler(CollectorClearHandler clearHandler);
 private:
         
-        bool wasFileSorted = false;
 	std::string _filename;
         double _lastValue;
         int _numElements = 0;
+        DataFileArray* _datafile;
+        DataFileArray* _sortedFile;
+        unsigned int _readPointer;
 private:
-        int sortFileInplace();
+    
         CollectorAddValueHandler _addValueHandler = nullptr;
         CollectorClearHandler _clearHandler = nullptr;
 };

@@ -17,18 +17,19 @@
 #include <math.h>
 
 StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
-    //_collector = new Traits<Statistics_if>::CollectorDatafileImplementation();
-    // avisar statistics datafile
-    //_collector->setAddValueHandler(setCollectorAddValueHandler(&StatisticsDataFileDummyImpl::collectorAddHandler, this));
-    //_collector->setClearHandler(setCollectorClearHandler(&StatisticsDataFileDummyImpl::collectorClearHandler, this));
+
+    _collectorDatafile = new Traits<Statistics_if>::CollectorDatafileImplementation();
+
+    _collectorDatafile->setAddValueHandler(setCollectorAddValueHandler(&StatisticsDataFileDummyImpl::collectorAddHandler, this));
+    _collectorDatafile->setClearHandler(setCollectorClearHandler(&StatisticsDataFileDummyImpl::collectorClearHandler, this));
+
     
-    _collector_test = new Traits<Statistics_if>::CollectorDatafileImplementation();
-    _collector_test->setAddValueHandler(setCollectorAddValueHandler(&StatisticsDataFileDummyImpl::collectorAddHandler, this));
-    _collector_test->setClearHandler(setCollectorClearHandler(&StatisticsDataFileDummyImpl::collectorClearHandler, this));
+    
 }
 
 unsigned int StatisticsDataFileDummyImpl::numElements() {
-    return _collector_test->numElements(); // dummy
+
+    return _collector->numElements(); // dummy
 }
 
 double StatisticsDataFileDummyImpl::min() {
@@ -37,6 +38,7 @@ double StatisticsDataFileDummyImpl::min() {
 
 double StatisticsDataFileDummyImpl::max() {
     return _max; // dummy
+
 }
 
 double StatisticsDataFileDummyImpl::average() {
@@ -44,10 +46,11 @@ double StatisticsDataFileDummyImpl::average() {
 }
 
 double StatisticsDataFileDummyImpl::mode() {
+
     // TODO sorted? if no then sort
     
     long n_mode = 1; // qtd de repeticoes da moda
-    double elem_mode = _collector_test->getValue(0); // o elemento que eh a moda
+    double elem_mode = _collectorDatafile->getValueOrdered(0); // o elemento que eh a moda
     
     long n = 1; // qtd de repeticoes do valor sendo analisado
     double elem = elem_mode; // o elemento sendo analisado, comeca sendo o mode
@@ -56,7 +59,7 @@ double StatisticsDataFileDummyImpl::mode() {
     
     // for comeca em 1 pois o primeiro item ja foi "lido"
     for(int i = 1; i < _elems; i++) {
-        elem_aux = _collector_test->getValue(i);
+        elem_aux = _collectorDatafile->getValue(i);
     
         if(elem == elem_aux) {
             n += 1;
@@ -78,6 +81,7 @@ double StatisticsDataFileDummyImpl::mode() {
     }
     
     return elem_mode; // dummy
+
 }
 
 double StatisticsDataFileDummyImpl::mediane() {
@@ -94,6 +98,7 @@ double StatisticsDataFileDummyImpl::mediane() {
 }
 
 double StatisticsDataFileDummyImpl::variance() {
+
     // (_variance * (_elems - 1) + pow(lastValue - _average, 2)) / _elems
     
     if(!_wasAltered_variance) {
@@ -107,7 +112,7 @@ double StatisticsDataFileDummyImpl::variance() {
     mpf_inits(f_variance, f_elems, f_lastValue, f_average, f_aux, f_auxTwo, NULL);
     
     mpf_set_ui(f_elems, _elems);
-    mpf_set_d(f_lastValue, _collector_test->getLastValue());
+    mpf_set_d(f_lastValue, _collectorDatafile->getLastValue());
     mpf_set_d(f_average, _average);
     mpf_set_d(f_variance, _variance);
     
@@ -197,6 +202,7 @@ double StatisticsDataFileDummyImpl::halfWidthConfidenceInterval() {
     _wasAltered_halfWidth = false;
     
     return _halfWidth; // dummy
+
 }
 
 unsigned int StatisticsDataFileDummyImpl::newSampleSize(double halfWidth) {
@@ -234,8 +240,8 @@ double StatisticsDataFileDummyImpl::quartil(unsigned short num) {
     double aux = (num * (_elems + 1))/4;            //            ( n * (elems + 1) ) / 4
     int k = (int) aux;
     aux = aux - k;                                  //          ( ( n * (elems + 1) ) / 4 ) - k
-    double xk = _collector_test->getValue(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collector_test->getValue(k);
+    double xk = _collectorDatafile->getValue(k-1);     // k-1 pois array comeca em zero
+    double xk_next = _collectorDatafile->getValue(k);
     double auxTwo = xk_next - xk;                   //                                              ( x(k+1) - x(k) )
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
@@ -264,8 +270,8 @@ double StatisticsDataFileDummyImpl::decil(unsigned short num) {
     double aux = (num * (_elems + 1))/10;           //             ( n * (elems + 1) ) / 10
     int k = (int) aux;
     aux = aux - k;                                  //           ( ( n * (elems + 1) ) / 10 ) - k
-    double xk = _collector_test->getValue(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collector_test->getValue(k);
+    double xk = _collectorDatafile->getValue(k-1);     // k-1 pois array comeca em zero
+    double xk_next = _collectorDatafile->getValue(k);
     double auxTwo = xk_next - xk;                   //                                               ( x(k+1) - x(k) )
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
@@ -294,8 +300,8 @@ double StatisticsDataFileDummyImpl::centil(unsigned short num) {
     double aux = (num * (_elems + 1))/100;           //         ( n * (elems + 1) ) / 100
     int k = (int) aux;
     aux = aux - k;                                  //        ( ( n * (elems + 1) ) / 100 ) - k
-    double xk = _collector_test->getValue(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collector_test->getValue(k);
+    double xk = _collectorDatafile->getValue(k-1);     // k-1 pois array comeca em zero
+    double xk_next = _collectorDatafile->getValue(k);
     double auxTwo = xk_next - xk;                   //                                              ( x(k+1) - x(k) )
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
@@ -335,7 +341,7 @@ unsigned int StatisticsDataFileDummyImpl::histogramClassFrequency(unsigned short
     unsigned int count = 0;
     double value;
     for(int i = 0; i < _elems; i++){
-        value = _collector_test->getValue(i);
+        value = _collectorDatafile->getValue(i);
         if(value < histogramClassLowerLimit(classNum)){/*pass*/}
         else if(value >= histogramClassLowerLimit(classNum + 1)) {
             break;
@@ -347,11 +353,11 @@ unsigned int StatisticsDataFileDummyImpl::histogramClassFrequency(unsigned short
 }
 
 Collector_if* StatisticsDataFileDummyImpl::getCollector() {
-    return this->_collector;
+    return this->_collectorDatafile;
 }
 
 void StatisticsDataFileDummyImpl::setCollector(Collector_if* collector) {
-    _collector = collector;
+    _collectorDatafile = collector;
 }
 
 double StatisticsDataFileDummyImpl::getConfidenceLevel(){
@@ -364,7 +370,7 @@ void StatisticsDataFileDummyImpl::setConfidenceLevel(double confidencelevel){
 
 void StatisticsDataFileDummyImpl::collectorAddHandler(double newValue){
     // do stuff with new value
-    _elems = _collector_test->numElements();
+    _elems = _collectorDatafile->numElements();
     if(newValue < _min){
         _min = newValue;
     }
@@ -374,13 +380,25 @@ void StatisticsDataFileDummyImpl::collectorAddHandler(double newValue){
     
     _sum += newValue;
     _average = _sum / _elems;
+
     
     _wasAltered_variance = true;
     _wasAltered_stddeviation = true;
     _wasAltered_variationCoef = true;
     _wasAltered_halfWidth = true;
+
 }
 
 void StatisticsDataFileDummyImpl::collectorClearHandler(){
     // do stuff to reset 
+    _elems = 0;
+    _min = +1e+99;
+    _max = -1e+99;
+    _sum = 0.0;
+    _sumSquare = 0.0;
+    _average = 0.0;
+    _variance = 0.0;
+    _stddeviation = 0.0;
+    _variationCoef = 0.0;
+    _halfWidth = 0.0;
 }
