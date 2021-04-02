@@ -15,17 +15,29 @@
 #define DATAFILEARRAY_H
 
 #include <fstream>
+#include <algorithm>
+#include <queue>
+#include <fstream>
+#include<sstream>
+#include <queue>
+#include<algorithm>
 
 class DataFileArray {
 public:
-    DataFileArray(const char* filename): filename{filename}{};
+    DataFileArray(const char* filename): filename{filename}, size{0} {};
     void write(double data);
     double read(unsigned int line);
-    virtual ~DataFileArray();
+    ~DataFileArray();
+    double read();
+    void sortFile();
+private:
+    void _mergeTempFiles(int totalChunks);
+    
 private:
     std::fstream file;
     std::size_t size;
     std::string filename;
+    
 };
 
 #endif /* DATAFILEARRAY_H */

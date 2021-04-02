@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 	for (unsigned int i = 0; i < 1e3; i++)
 		std::this_thread::yield(); // Give the IDE a try to output previous traces
 	std::cout << "Press ENTER to quit...";
-	std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+//	std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
 	return res;
     
   	

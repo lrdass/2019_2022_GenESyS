@@ -14,6 +14,8 @@
 #include "CollectorApp.h"
 #include "DataFileArray.h"
 #include <gmp.h>
+#include <stdlib.h>
+#include <iostream>
 
 CollectorApp::CollectorApp() {
 }
@@ -24,10 +26,10 @@ int CollectorApp::main(int argc, char** argv) {
     StatisticsDataFileDummyImpl* imp = new StatisticsDataFileDummyImpl();
     
     Collector_if* collector = imp->getCollector();
-    for (double i = 0.0; i < 200; i++){
-        collector->addValue(i);
-       
-    }
+//    for (double i = 0.0; i < 200; i++){
+//        collector->addValue(i);
+//       
+//    }
     
 //    collector->addValue(1.0);
 //    collector->addValue(3.0);
@@ -40,17 +42,18 @@ int CollectorApp::main(int argc, char** argv) {
 //    StatisticsDefaultImpl1 * statImp = new StatisticsDefaultImpl1();
 //    Collector_if* coll = statImp->getCollector();
 
+    
+    
     DataFileArray* data = new DataFileArray("datafile.dat");
-
     
-    data->write(40);
-    
-//    std::cout << data->read(40) << std::endl;
-//    std::cout << data->read(41) << std::endl;
-    
-    for (double i =0; i < 201; i++){
-        std::cout << data->read(i) << std::endl;
+    for (int i = 40; i > 0; i--){
+        
+        std::cout << std::to_string(i) << std::endl;
+        data->write(i);
     }
+
+  
+    data->sortFile();
     
 //    
 //    
