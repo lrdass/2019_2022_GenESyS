@@ -36,6 +36,7 @@ void CollectorDatafileDefaultImpl1::addValue(double value) {
     wasFileSorted = false;
     if(_sortedFile != nullptr)
         _sortedFile->clear();
+        _sortedFile = nullptr;
     
     _datafile->write(value);
     
@@ -90,6 +91,7 @@ double CollectorDatafileDefaultImpl1::getValueOrdered(unsigned int num){
     }
     else{
         _datafile->sortFile();
+        _sortedFile = new DataFileArray(std::string{_filename+"_sorted"}.c_str());
         return _sortedFile->read(num);
     }
 }

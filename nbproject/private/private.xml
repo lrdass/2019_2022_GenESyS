@@ -11,9 +11,7 @@
         </group>
         <group>
             <file>file:/home/lrdass/Workspace/ufsc/modsim/genesys/CollectorApp.h</file>
-            <file>file:/home/lrdass/Workspace/ufsc/modsim/genesys/CollectorDatafileDefaultImpl1.cpp</file>
             <file>file:/home/lrdass/Workspace/ufsc/modsim/genesys/CollectorDefaultImpl1.cpp</file>
-            <file>file:/home/lrdass/Workspace/ufsc/modsim/genesys/Collector_if.h</file>
             <file>file:/home/lrdass/Workspace/ufsc/modsim/genesys/StatisticsDataFileDefaultImpl.h</file>
             <file>file:/home/lrdass/Workspace/ufsc/modsim/genesys/main.cpp</file>
             <file>file:/home/lrdass/Workspace/ufsc/modsim/genesys/CollectorDatafile_if.h</file>
