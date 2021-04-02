@@ -47,8 +47,6 @@ double StatisticsDataFileDummyImpl::average() {
 
 double StatisticsDataFileDummyImpl::mode() {
 
-    // TODO sorted? if no then sort
-    
     long n_mode = 1; // qtd de repeticoes da moda
     double elem_mode = _collectorDatafile->getValueOrdered(0); // o elemento que eh a moda
     
@@ -59,7 +57,7 @@ double StatisticsDataFileDummyImpl::mode() {
     
     // for comeca em 1 pois o primeiro item ja foi "lido"
     for(int i = 1; i < _elems; i++) {
-        elem_aux = _collectorDatafile->getValue(i);
+        elem_aux = _collectorDatafile->getValueOrdered(i);
     
         if(elem == elem_aux) {
             n += 1;
@@ -68,12 +66,10 @@ double StatisticsDataFileDummyImpl::mode() {
                 n_mode = n;
                 elem_mode = elem;
             }
-    
             elem = elem_aux;
             n = 1;
         }
     }
-    
     
     if (n > n_mode) {
         n_mode = n;
@@ -85,15 +81,15 @@ double StatisticsDataFileDummyImpl::mode() {
 }
 
 double StatisticsDataFileDummyImpl::mediane() {
-    // TODO sorted? if no then sort
     
     if (_elems % 2 == 0) { // Even? Then take n/2 and (n/2)-1 and average them (-1 because index starts from zero)
-        double aux = (_elems/2); //  n/2
-        double auxTwo = aux - 1; // (n/2)-1
+    //MPF
+        double aux = _collectorDatafile->getValueOrdered(_elems/2); //  n/2
+        double auxTwo = _collectorDatafile->getValueOrdered((_elems/2) - 1); // (n/2)-1
         
         return (aux + auxTwo)/2;
     } else { // Odd? Then take (n/2)-0.5
-        return (_elems/2) - 0.5; // dummy
+        return _collectorDatafile->getValueOrdered((_elems/2) - 0.5); // dummy
     }
 }
 
@@ -124,7 +120,7 @@ double StatisticsDataFileDummyImpl::variance() {
     mpf_div(f_aux, f_aux, f_elems);            // (_variance * (_elems - 1) + pow(lastValue - _average, 2)) / _elems
     
     _variance = mpf_get_d(f_aux);              // _variance <- float _variance (possivel truncamento)
-    
+    mpf_clears(f_variance, f_elems, f_lastValue, f_average, f_aux, f_auxTwo, NULL);
     _wasAltered_variance = false;
     
     return _variance; // dummy
@@ -145,7 +141,7 @@ double StatisticsDataFileDummyImpl::stddeviation() {
     mpf_sqrt(f_stddeviation, f_variance);
     
     _stddeviation = mpf_get_d(f_stddeviation);
-    
+    mpf_clears(f_variance, f_stddeviation, NULL);
     _wasAltered_stddeviation = false;
     
     return _stddeviation; // dummy
@@ -155,19 +151,21 @@ double StatisticsDataFileDummyImpl::variationCoef() {
     if(!_wasAltered_variationCoef) {
         return _variationCoef;
     }
-    
-    mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
-    mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
-    
-    mpf_t f_variationCoef, f_stddeviation, f_average, f_aux;
-    mpf_inits(f_variationCoef, f_stddeviation, f_average, f_aux, NULL);
-    
-    mpf_set_d(f_stddeviation, stddeviation());
-    mpf_set_d(f_average, _average);
-    
     if (_average != 0) {
+        mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
+        mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
+    
+        mpf_t f_variationCoef, f_stddeviation, f_average, f_aux;
+        mpf_inits(f_variationCoef, f_stddeviation, f_average, f_aux, NULL);
+    
+        mpf_set_d(f_stddeviation, stddeviation());
+        mpf_set_d(f_average, _average);
+    
         mpf_div(f_variationCoef, f_stddeviation, f_average); // _variationCoef = _stddeviation/_average;
         _variationCoef = mpf_get_d(f_variationCoef);
+        
+        mpf_clears(f_variationCoef, f_stddeviation, f_average, f_aux, NULL);
+        
     } else {
         _variationCoef = 0.0;
     }
@@ -198,6 +196,7 @@ double StatisticsDataFileDummyImpl::halfWidthConfidenceInterval() {
     mpf_mul(f_aux, f_auxTwo, f_aux); //_criticalTn_1 * (_stddeviation / std::sqrt(_elems))
     
     _halfWidth = mpf_get_d(f_aux);
+    mpf_clears(f_elems, f_aux, f_auxTwo, NULL);
     
     _wasAltered_halfWidth = false;
     
@@ -225,9 +224,11 @@ unsigned int StatisticsDataFileDummyImpl::newSampleSize(double halfWidth) {
     mpf_mul(f_auxTwo, f_halfWidth, f_halfWidth);        //                                                                        halfWidth * halfWidth
     mpf_div(f_sampleSize, f_aux, f_auxTwo);             // (_criticalTn_1 * _criticalTn_1 * _stddeviation * (1 - _stddeviation))/(halfWidth * halfWidth)
     
+    unsigned int sampleSize = (unsigned int) mpf_get_d(f_sampleSize);
+    mpf_clears(f_sampleSize, f_criticalTn_1, f_stddeviation, f_halfWidth, f_aux, f_auxTwo, NULL);
     // _stddeviation
     // _criticalTn_1 eh o Z-score
-    return (unsigned int) mpf_get_d(f_sampleSize); // dummy
+    return sampleSize; // dummy
 }
 
 double StatisticsDataFileDummyImpl::quartil(unsigned short num) {
@@ -240,8 +241,8 @@ double StatisticsDataFileDummyImpl::quartil(unsigned short num) {
     double aux = (num * (_elems + 1))/4;            //            ( n * (elems + 1) ) / 4
     int k = (int) aux;
     aux = aux - k;                                  //          ( ( n * (elems + 1) ) / 4 ) - k
-    double xk = _collectorDatafile->getValue(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collectorDatafile->getValue(k);
+    double xk = _collectorDatafile->getValueOrdered(k-1);     // k-1 pois array comeca em zero
+    double xk_next = _collectorDatafile->getValueOrdered(k);
     double auxTwo = xk_next - xk;                   //                                              ( x(k+1) - x(k) )
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
@@ -255,7 +256,13 @@ double StatisticsDataFileDummyImpl::quartil(unsigned short num) {
     
     mpf_mul(f_aux, f_aux, f_auxTwo);
     
-    double quartil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 4 ) - k ) * ( x(k+1) - x(k) )
+    //double quartil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 4 ) - k ) * ( x(k+1) - x(k) )
+    
+    mpf_set_d(f_auxTwo, xk);
+    mpf_add(f_aux, f_aux, f_auxTwo);
+    
+    double quartil = mpf_get_d(f_aux);
+    mpf_clears(f_aux, f_auxTwo, NULL);
     
     return quartil; // dummy
 }
@@ -270,8 +277,8 @@ double StatisticsDataFileDummyImpl::decil(unsigned short num) {
     double aux = (num * (_elems + 1))/10;           //             ( n * (elems + 1) ) / 10
     int k = (int) aux;
     aux = aux - k;                                  //           ( ( n * (elems + 1) ) / 10 ) - k
-    double xk = _collectorDatafile->getValue(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collectorDatafile->getValue(k);
+    double xk = _collectorDatafile->getValueOrdered(k-1);     // k-1 pois array comeca em zero
+    double xk_next = _collectorDatafile->getValueOrdered(k);
     double auxTwo = xk_next - xk;                   //                                               ( x(k+1) - x(k) )
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
@@ -285,7 +292,13 @@ double StatisticsDataFileDummyImpl::decil(unsigned short num) {
     
     mpf_mul(f_aux, f_aux, f_auxTwo);
     
-    double decil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 10 ) - k ) * ( x(k+1) - x(k) )
+    //double decil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 10 ) - k ) * ( x(k+1) - x(k) )
+    
+    mpf_set_d(f_auxTwo, xk);
+    mpf_add(f_aux, f_aux, f_auxTwo);
+    
+    double decil = mpf_get_d(f_aux);
+    mpf_clears(f_aux, f_auxTwo, NULL);
     
     return decil; // dummy
 }
@@ -300,8 +313,8 @@ double StatisticsDataFileDummyImpl::centil(unsigned short num) {
     double aux = (num * (_elems + 1))/100;           //         ( n * (elems + 1) ) / 100
     int k = (int) aux;
     aux = aux - k;                                  //        ( ( n * (elems + 1) ) / 100 ) - k
-    double xk = _collectorDatafile->getValue(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collectorDatafile->getValue(k);
+    double xk = _collectorDatafile->getValueOrdered(k-1);     // k-1 pois array comeca em zero
+    double xk_next = _collectorDatafile->getValueOrdered(k);
     double auxTwo = xk_next - xk;                   //                                              ( x(k+1) - x(k) )
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
@@ -315,7 +328,12 @@ double StatisticsDataFileDummyImpl::centil(unsigned short num) {
     
     mpf_mul(f_aux, f_aux, f_auxTwo);
     
-    double centil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 100 ) - k ) * ( x(k+1) - x(k) )
+    //double centil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 100 ) - k ) * ( x(k+1) - x(k) )
+    
+    mpf_set_d(f_auxTwo, xk);
+    mpf_add(f_aux, f_aux, f_auxTwo);
+    double centil = mpf_get_d(f_aux);
+    mpf_clears(f_aux, f_auxTwo, NULL);
     
     return centil; // dummy
 }
@@ -325,23 +343,42 @@ void StatisticsDataFileDummyImpl::setHistogramNumClasses(unsigned short num) {
 }
 
 unsigned short StatisticsDataFileDummyImpl::histogramNumClasses() {
-    //short num_classes = sqrt(_collector->numElements()) + 1;
-    //return num_classes;
+    if (_histogramclassNum == 0) {
+        _histogramclassNum = sqrt(_collector->numElements()) + 1;
+    }
     return _histogramclassNum; // dummy
 }
 
 double StatisticsDataFileDummyImpl::histogramClassLowerLimit(unsigned short classNum) {
-    double range = _max - _min;
-    double amplitude = range/_histogramclassNum;
-    return (_min + (classNum - 1) * amplitude);
-    //return 0.0; // dummy
+    //MPF
+    mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
+    mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
+    
+    mpf_t f_aux, f_auxTwo;
+    mpf_inits(f_aux, f_auxTwo, NULL);
+    
+    //double range = _max - _min;
+    mpf_set_d(f_aux, _max);
+    mpf_set_d(f_auxTwo, _min);
+    mpf_sub(f_aux, f_aux, f_auxTwo);
+    
+    //double amplitude = range/_histogramclassNum;
+    mpf_div_ui(f_aux, f_aux, histogramNumClasses());
+    
+    //return (_min + (classNum - 1) * amplitude);
+    mpf_mul_ui(f_aux, f_aux, (classNum -1));
+    mpf_add(f_aux, f_auxTwo, f_aux);
+    double lowerLimit = mpf_get_d(f_aux);
+    mpf_clears(f_aux, f_auxTwo, NULL);
+    
+    return lowerLimit; // dummy
 }
 
 unsigned int StatisticsDataFileDummyImpl::histogramClassFrequency(unsigned short classNum) {
     unsigned int count = 0;
     double value;
     for(int i = 0; i < _elems; i++){
-        value = _collectorDatafile->getValue(i);
+        value = _collectorDatafile->getValueOrdered(i);
         if(value < histogramClassLowerLimit(classNum)){/*pass*/}
         else if(value >= histogramClassLowerLimit(classNum + 1)) {
             break;
@@ -371,6 +408,7 @@ void StatisticsDataFileDummyImpl::setConfidenceLevel(double confidencelevel){
 void StatisticsDataFileDummyImpl::collectorAddHandler(double newValue){
     // do stuff with new value
     _elems = _collectorDatafile->numElements();
+    
     if(newValue < _min){
         _min = newValue;
     }
@@ -379,8 +417,17 @@ void StatisticsDataFileDummyImpl::collectorAddHandler(double newValue){
     }
     
     _sum += newValue;
-    _average = _sum / _elems;
-
+    
+    mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
+    mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
+    
+    mpf_t f_aux;
+    mpf_init(f_aux);
+    // _average = _sum / _elems;
+    mpf_set_d(f_aux, _sum);
+    mpf_div_ui(f_aux, f_aux, _elems);
+    _average = mpf_get_d(f_aux);
+    mpf_clear(f_aux);
     
     _wasAltered_variance = true;
     _wasAltered_stddeviation = true;
@@ -401,4 +448,10 @@ void StatisticsDataFileDummyImpl::collectorClearHandler(){
     _stddeviation = 0.0;
     _variationCoef = 0.0;
     _halfWidth = 0.0;
+    
+    _histogramclassNum = 0;
+    _wasAltered_variance = false;
+    _wasAltered_stddeviation = false;
+    _wasAltered_variationCoef = false;
+    _wasAltered_halfWidth = false;
 }

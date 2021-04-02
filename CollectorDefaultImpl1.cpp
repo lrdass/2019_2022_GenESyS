@@ -28,6 +28,7 @@ void CollectorDefaultImpl1::clear() {
 void CollectorDefaultImpl1::addValue(double value) {
 	_lastValue = value;
 	_numElements++;
+        
 	if (_addValueHandler != nullptr) {
 		_addValueHandler(value);
 	}

@@ -70,7 +70,7 @@ private:
         double _criticalTn_1 = 1.96;
         double _halfWidth;
         
-        unsigned short _histogramclassNum;
+        unsigned short _histogramclassNum = 0;
         
         bool _wasAltered_variance = false;
         bool _wasAltered_stddeviation = false;

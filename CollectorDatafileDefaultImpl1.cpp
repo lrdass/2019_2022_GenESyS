@@ -28,11 +28,13 @@ void CollectorDatafileDefaultImpl1::clear() {
     if(_clearHandler != nullptr){
         _clearHandler();
     }
+    wasFileSorted = false;
     
 }
 
 void CollectorDatafileDefaultImpl1::addValue(double value) { 
     
+    printf("add elem: %f\n",value);
     wasFileSorted = false;
     if(_sortedFile != nullptr)
         _sortedFile->clear();
@@ -93,6 +95,7 @@ double CollectorDatafileDefaultImpl1::getValueOrdered(unsigned int num){
     else{
         _datafile->sortFile();
         _sortedFile = new DataFileArray(std::string{_filename+"_sorted"}.c_str());
+        wasFileSorted = true;
         return _sortedFile->read(num);
     }
 }
