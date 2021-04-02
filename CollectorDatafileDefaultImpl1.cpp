@@ -17,7 +17,7 @@ CollectorDatafileDefaultImpl1::CollectorDatafileDefaultImpl1() {
     wasFileSorted = false;
     _filename = "datafile.dat";
 
-    _datafile = new DataFileArray(_filename);
+    _datafile = new DataFileArray(_filename.c_str());
 
 }
 
@@ -84,7 +84,7 @@ void CollectorDatafileDefaultImpl1::setClearHandler(CollectorClearHandler clearH
 }
 
 
-void CollectorDatafileDefaultImpl1::getValueOrdered(unsigned int num){
+double CollectorDatafileDefaultImpl1::getValueOrdered(unsigned int num){
     if(wasFileSorted){
         return _sortedFile->read(num);
     }

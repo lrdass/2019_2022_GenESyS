@@ -13,9 +13,11 @@
 
 #include "CollectorApp.h"
 #include "DataFileArray.h"
+#include "CollectorDatafile_if.h"
 #include <gmp.h>
 #include <stdlib.h>
 #include <iostream>
+#include "CollectorDatafileDefaultImpl1.h"
 
 CollectorApp::CollectorApp() {
 }
@@ -25,14 +27,16 @@ int CollectorApp::main(int argc, char** argv) {
     
     StatisticsDataFileDummyImpl* imp = new StatisticsDataFileDummyImpl();
     
-    Collector_if* collector = imp->getCollector();
+    CollectorDatafileDefaultImpl1* collector = imp->getCollector();
     
     
     collector->addValue(1.0);
     collector->addValue(3.0);
     collector->addValue(1.5);
     
-    std::cout<< collector->getLastValue() << std::endl;
+    std::cout<< "last value " << collector->getLastValue() << std::endl;
+    
+    std::cout<< "pos 0 " << collector->getValueOrdered(0) << std::endl;
     
 
    

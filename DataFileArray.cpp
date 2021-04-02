@@ -13,7 +13,7 @@
 
 #include <iomanip>
 #include <istream>
-#include <iostream>
+
 
 #include "DataFileArray.h"
 //
@@ -164,7 +164,6 @@ void DataFileArray::_mergeTempFiles(int totalChunks){
         
     while(!minHeap.empty()){
         std::pair<double, int> value = minHeap.top();
-        std::cout << std::to_string(value.first)<< std::endl;
         minHeap.pop();
 
         // write on final sorted file
@@ -180,7 +179,7 @@ void DataFileArray::_mergeTempFiles(int totalChunks){
     for (int i = 1; i <= totalChunks; i++) {
         chunkFiles[i - 1].close();
         std::string sortedChunkFile = filename+"_temp"+ std::to_string(i);
-        std::remove(sortedChunkFile);
+        std::remove(sortedChunkFile.c_str());
         
     }
      delete[] chunkFiles;

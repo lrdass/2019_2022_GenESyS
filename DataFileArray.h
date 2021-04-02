@@ -21,6 +21,7 @@
 #include<sstream>
 #include <queue>
 #include<algorithm>
+#include <cstdio>
 
 class DataFileArray {
 public:

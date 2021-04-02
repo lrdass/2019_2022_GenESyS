@@ -42,7 +42,7 @@ public:
 	std::string getDataFilename();
 	void setDataFilename(std::string filename);
         void sortFile();
-        void getValueOrdered(unsigned int num);
+        double getValueOrdered(unsigned int num);
 public:
 	void setAddValueHandler(CollectorAddValueHandler addValueHandler);
 	void setClearHandler(CollectorClearHandler clearHandler);
