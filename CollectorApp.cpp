@@ -26,34 +26,17 @@ int CollectorApp::main(int argc, char** argv) {
     StatisticsDataFileDummyImpl* imp = new StatisticsDataFileDummyImpl();
     
     Collector_if* collector = imp->getCollector();
-//    for (double i = 0.0; i < 200; i++){
-//        collector->addValue(i);
-//       
-//    }
     
-//    collector->addValue(1.0);
-//    collector->addValue(3.0);
-//    collector->addValue(1.5);
-//    
-//    std::cout<< collector->getLastValue() << std::endl;
-//     
-//    
-//    
-//    StatisticsDefaultImpl1 * statImp = new StatisticsDefaultImpl1();
-//    Collector_if* coll = statImp->getCollector();
+    
+    collector->addValue(1.0);
+    collector->addValue(3.0);
+    collector->addValue(1.5);
+    
+    std::cout<< collector->getLastValue() << std::endl;
+    
 
-    
-    
-    DataFileArray* data = new DataFileArray("datafile.dat");
-    
-    for (int i = 40; i > 0; i--){
-        
-        std::cout << std::to_string(i) << std::endl;
-        data->write(i);
-    }
-
+   
   
-    data->sortFile();
     
 //    
 //    

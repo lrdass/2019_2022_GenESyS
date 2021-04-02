@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <cmath>
 #include <limits>
+#include "DataFileArray.h"
 
 class CollectorDatafileDefaultImpl1 : public CollectorDatafile_if {
 public:
@@ -40,17 +41,20 @@ public:
 	void seekFirstValue();
 	std::string getDataFilename();
 	void setDataFilename(std::string filename);
+        void sortFile();
+        void getValueOrdered(unsigned int num);
 public:
 	void setAddValueHandler(CollectorAddValueHandler addValueHandler);
 	void setClearHandler(CollectorClearHandler clearHandler);
 private:
-        
         bool wasFileSorted = false;
 	std::string _filename;
         double _lastValue;
         int _numElements = 0;
+        DataFileArray* _datafile;
+        DataFileArray* _sortedFile;
 private:
-        int sortFileInplace();
+    
         CollectorAddValueHandler _addValueHandler = nullptr;
         CollectorClearHandler _clearHandler = nullptr;
 };

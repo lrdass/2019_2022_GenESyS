@@ -116,10 +116,12 @@ void DataFileArray::sortFile() {
         this->_mergeTempFiles(currentChunk);
     }
         
-    
-    
-   
-    
+}
+
+void DataFileArray::clear(){
+    std::ofstream ofs;
+    ofs.open(filename, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
 }
 
 struct compare
@@ -141,7 +143,6 @@ void writeOnFile(std::string filename, double value){
 }
 
 void DataFileArray::_mergeTempFiles(int totalChunks){
-//    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int> >, compare> minHeap;
     std::priority_queue<std::pair<double, int>, std::vector<std::pair<double, int>>, compare> minHeap;
     std::fstream* chunkFiles = new std::fstream[totalChunks];
   
@@ -176,8 +177,14 @@ void DataFileArray::_mergeTempFiles(int totalChunks){
 
     }
         
-    
- }
+    for (int i = 1; i <= totalChunks; i++) {
+        chunkFiles[i - 1].close();
+        std::string sortedChunkFile = filename+"_temp"+ std::to_string(i);
+        std::remove(sortedChunkFile);
+        
+    }
+     delete[] chunkFiles;
+}
 
 
 

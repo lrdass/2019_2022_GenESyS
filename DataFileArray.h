@@ -26,6 +26,7 @@ class DataFileArray {
 public:
     DataFileArray(const char* filename): filename{filename}, size{0} {};
     void write(double data);
+    void clear();
     double read(unsigned int line);
     ~DataFileArray();
     double read();

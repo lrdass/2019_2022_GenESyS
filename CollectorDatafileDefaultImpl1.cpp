@@ -15,22 +15,29 @@
 
 CollectorDatafileDefaultImpl1::CollectorDatafileDefaultImpl1() {
     wasFileSorted = false;
-    auto timestamp = std::time(0);
-//    _filename = "default_" + std::to_string(timestamp) + ".dat";
     _filename = "datafile.dat";
+
+    _datafile = new DataFileArray(_filename);
+
 }
 
 void CollectorDatafileDefaultImpl1::clear() {
+    _datafile->clear();
+    
+    this->_numElements = 0;
+    if(_clearHandler != nullptr){
+        _clearHandler();
+    }
+    
 }
 
 void CollectorDatafileDefaultImpl1::addValue(double value) { 
-    std::fstream file;
     
-    file.open(_filename,  std::ios::out | std::ios::app | std::ios::binary);
-    // dizer que o arquivo é de registros de doubles
-    // arquivo binario <double>
-    file.write((const char*) &value, sizeof(value));
-    file.close();
+    wasFileSorted = false;
+    if(_sortedFile != nullptr)
+        _sortedFile->clear();
+    
+    _datafile->write(value);
     
     this->_lastValue = value;
     this->_numElements +=1;
@@ -40,7 +47,7 @@ void CollectorDatafileDefaultImpl1::addValue(double value) {
     }
 }
 
-// ultimo valor inserido
+
 double CollectorDatafileDefaultImpl1::getLastValue() {
     return this->_lastValue;
 }
@@ -50,26 +57,7 @@ unsigned long CollectorDatafileDefaultImpl1::numElements() {
 }
 
 double CollectorDatafileDefaultImpl1::getValue(unsigned int num) {
-    if(!wasFileSorted){
-        sortFileInplace();
-        
-        std::ifstream file(_filename);
-        std::string line;
-        
-        if(file.is_open()){
-            file.seekg(-1, std::ios_base::end);
-            std::getline(file, line);
-            return std::stod(line);
-        }
-        return 0;
-        
-        
-        
-    } else{
-        
-        return 0.0;
-    }
-	
+    return _datafile->read(num);
 }
 
 double CollectorDatafileDefaultImpl1::getNextValue() {
@@ -88,21 +76,20 @@ void CollectorDatafileDefaultImpl1::setDataFilename(std::string filename) {
 }
 
 void CollectorDatafileDefaultImpl1::setAddValueHandler(CollectorAddValueHandler addValueHandler) {
-    
+    _addValueHandler = addValueHandler;
 }
 
 void CollectorDatafileDefaultImpl1::setClearHandler(CollectorClearHandler clearHandler) {
-
+    _clearHandler = clearHandler;
 }
 
-int CollectorDatafileDefaultImpl1::sortFileInplace(){
-    // https://codereview.stackexchange.com/questions/135241/sort-a-binary-file-without-loading-it-into-memory-or-using-a-temporary-file
-    std::string command = "sort "+_filename + " -o " + _filename;
-    
-    if(system(command.c_str()) == 0){
-        wasFileSorted = true;
-        return 0;
+
+void CollectorDatafileDefaultImpl1::getValueOrdered(unsigned int num){
+    if(wasFileSorted){
+        return _sortedFile->read(num);
     }
-    return -1;
+    else{
+        _datafile->sortFile();
+        return _sortedFile->read(num);
+    }
 }
-

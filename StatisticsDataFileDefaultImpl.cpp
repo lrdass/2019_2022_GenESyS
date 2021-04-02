@@ -16,7 +16,7 @@
 
 StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
     _collector = new Traits<Statistics_if>::CollectorDatafileImplementation();
-    // avisar statistics datafile
+    
     _collector->setAddValueHandler(setCollectorAddValueHandler(&StatisticsDataFileDummyImpl::collectorAddHandler, this));
     _collector->setClearHandler(setCollectorClearHandler(&StatisticsDataFileDummyImpl::collectorClearHandler, this));
     
