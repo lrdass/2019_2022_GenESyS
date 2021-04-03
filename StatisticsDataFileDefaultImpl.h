@@ -57,22 +57,21 @@ private:
 	Collector_if* _collector;
         CollectorDatafileDefaultImpl1* _collectorDatafile;
         		
-        unsigned long _elems;
-        double _sum;
-        double _sumSquare;
-        double _min;
-        double _max;
-        double _average;
-        double _variance;
-        double _stddeviation;
-        double _variationCoef;
+        unsigned long _elems = 0;
+        double _sum = 0.0;
+        double _sumSquare = 0.0;
+        double _min = +1e+99;
+        double _max = -1e+99;
+        double _average = 0.0;
+        double _variance = 0.0;
+        double _stddeviation = 0.0;
+        double _variationCoef = 0.0;
         double _confidenceLevel = 0.95;
         double _criticalTn_1 = 1.96;
-        double _halfWidth;
+        double _halfWidth = 0.0;
         
         unsigned short _histogramclassNum = 0;
         
-        bool _wasAltered_variance = false;
         bool _wasAltered_stddeviation = false;
         bool _wasAltered_variationCoef = false;
         bool _wasAltered_halfWidth = false;

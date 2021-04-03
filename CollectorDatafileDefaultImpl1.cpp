@@ -34,7 +34,6 @@ void CollectorDatafileDefaultImpl1::clear() {
 
 void CollectorDatafileDefaultImpl1::addValue(double value) { 
     
-    printf("add elem: %f\n",value);
     wasFileSorted = false;
     if(_sortedFile != nullptr)
         _sortedFile->clear();

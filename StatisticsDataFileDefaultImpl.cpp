@@ -28,8 +28,7 @@ StatisticsDataFileDummyImpl::StatisticsDataFileDummyImpl() {
 }
 
 unsigned int StatisticsDataFileDummyImpl::numElements() {
-
-    return _collector->numElements(); // dummy
+    return _elems; // dummy
 }
 
 double StatisticsDataFileDummyImpl::min() {
@@ -94,35 +93,6 @@ double StatisticsDataFileDummyImpl::mediane() {
 }
 
 double StatisticsDataFileDummyImpl::variance() {
-
-    // (_variance * (_elems - 1) + pow(lastValue - _average, 2)) / _elems
-    
-    if(!_wasAltered_variance) {
-        return _variance;
-    }
-    
-    mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
-    mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
-    
-    mpf_t f_variance, f_elems, f_lastValue, f_average, f_aux, f_auxTwo;
-    mpf_inits(f_variance, f_elems, f_lastValue, f_average, f_aux, f_auxTwo, NULL);
-    
-    mpf_set_ui(f_elems, _elems);
-    mpf_set_d(f_lastValue, _collectorDatafile->getLastValue());
-    mpf_set_d(f_average, _average);
-    mpf_set_d(f_variance, _variance);
-    
-    mpf_sub_ui(f_aux, f_elems, 1);             //               _elems - 1
-    mpf_mul(f_aux, f_variance, f_aux);         //  _variance * (_elems - 1)
-    mpf_sub(f_auxTwo, f_lastValue, f_average); //                                 lastValue - _average
-    mpf_pow_ui(f_auxTwo, f_auxTwo, 2);         //                             pow(lastValue - _average, 2)
-    mpf_add(f_aux, f_aux, f_auxTwo);           //  _variance * (_elems - 1) + pow(lastValue - _average, 2)
-    mpf_div(f_aux, f_aux, f_elems);            // (_variance * (_elems - 1) + pow(lastValue - _average, 2)) / _elems
-    
-    _variance = mpf_get_d(f_aux);              // _variance <- float _variance (possivel truncamento)
-    mpf_clears(f_variance, f_elems, f_lastValue, f_average, f_aux, f_auxTwo, NULL);
-    _wasAltered_variance = false;
-    
     return _variance; // dummy
 }
 
@@ -205,7 +175,7 @@ double StatisticsDataFileDummyImpl::halfWidthConfidenceInterval() {
 }
 
 unsigned int StatisticsDataFileDummyImpl::newSampleSize(double halfWidth) {
-    // sampleSize = (_criticalTn_1 * _criticalTn_1 * _stddeviation * (1 - _stddeviation))/(halfWidth * 2)
+    // sampleSize = (_criticalTn_1 * _criticalTn_1 * _stddeviation * (1 - _stddeviation))/(halfWidth^2)
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
     mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
@@ -223,7 +193,7 @@ unsigned int StatisticsDataFileDummyImpl::newSampleSize(double halfWidth) {
     mpf_mul(f_aux, f_aux, f_auxTwo);                    //  _criticalTn_1 * _criticalTn_1 * _stddeviation * (1 - _stddeviation)
     mpf_mul(f_auxTwo, f_halfWidth, f_halfWidth);        //                                                                        halfWidth * halfWidth
     mpf_div(f_sampleSize, f_aux, f_auxTwo);             // (_criticalTn_1 * _criticalTn_1 * _stddeviation * (1 - _stddeviation))/(halfWidth * halfWidth)
-    
+
     unsigned int sampleSize = (unsigned int) mpf_get_d(f_sampleSize);
     mpf_clears(f_sampleSize, f_criticalTn_1, f_stddeviation, f_halfWidth, f_aux, f_auxTwo, NULL);
     // _stddeviation
@@ -236,33 +206,32 @@ double StatisticsDataFileDummyImpl::quartil(unsigned short num) {
         throw std::invalid_argument("Value is not within bounds of this operation");
     }
     
-    // TODO sorted? if no then sort
-    
-    double aux = (num * (_elems + 1))/4;            //            ( n * (elems + 1) ) / 4
-    int k = (int) aux;
-    aux = aux - k;                                  //          ( ( n * (elems + 1) ) / 4 ) - k
-    double xk = _collectorDatafile->getValueOrdered(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collectorDatafile->getValueOrdered(k);
-    double auxTwo = xk_next - xk;                   //                                              ( x(k+1) - x(k) )
-    
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
     mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
     
-    mpf_t f_aux, f_auxTwo;
-    mpf_inits(f_aux, f_auxTwo, NULL);
+    mpf_t f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo;
+    mpf_inits(f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo, f_aux, f_auxTwo, NULL);
     
-    mpf_set_d(f_aux, aux);
-    mpf_set_d(f_auxTwo, auxTwo);
+    mpf_set_ui(f_elems, _elems);
+    mpf_set_ui(f_n, num);
     
-    mpf_mul(f_aux, f_aux, f_auxTwo);
+    mpf_add_ui(f_aux, f_elems, 1);      //                   elems + 1
+    mpf_mul(f_aux, f_n, f_aux);         //              n * (elems + 1)
+    mpf_div_ui(f_aux, f_aux, 4);        //          ( ( n * (elems + 1) ) / 4 )
     
-    //double quartil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 4 ) - k ) * ( x(k+1) - x(k) )
+    int k = (int) mpf_get_d(f_aux);     // k <- (int) ( ( n * (elems + 1) ) / 4 )
+    mpf_set_ui(f_k, k);
     
-    mpf_set_d(f_auxTwo, xk);
-    mpf_add(f_aux, f_aux, f_auxTwo);
+    mpf_set_d(f_xk, _collectorDatafile->getValueOrdered(k-1));
+    mpf_set_d(f_xk_next, _collectorDatafile->getValueOrdered(k));
     
+    mpf_sub(f_aux, f_aux, f_k);         //        ( ( ( n * (elems + 1) ) / 4 ) - k )
+    mpf_sub(f_auxTwo, f_xk_next, f_xk); //                                              ( x(k+1) - x(k) )
+    mpf_mul(f_aux, f_aux, f_auxTwo);    //        ( ( ( n * (elems + 1) ) / 4 ) - k ) * ( x(k+1) - x(k) )
+    mpf_add(f_aux, f_xk, f_aux);        // x(k) + ( ( ( n * (elems + 1) ) / 4 ) - k ) * ( x(k+1) - x(k) )
+
     double quartil = mpf_get_d(f_aux);
-    mpf_clears(f_aux, f_auxTwo, NULL);
+    mpf_clears(f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo, NULL);
     
     return quartil; // dummy
 }
@@ -272,33 +241,32 @@ double StatisticsDataFileDummyImpl::decil(unsigned short num) {
         throw std::invalid_argument("Value is not within bounds of this operation");
     }
     
-    // TODO sorted? if no then sort
-    
-    double aux = (num * (_elems + 1))/10;           //             ( n * (elems + 1) ) / 10
-    int k = (int) aux;
-    aux = aux - k;                                  //           ( ( n * (elems + 1) ) / 10 ) - k
-    double xk = _collectorDatafile->getValueOrdered(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collectorDatafile->getValueOrdered(k);
-    double auxTwo = xk_next - xk;                   //                                               ( x(k+1) - x(k) )
-    
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
     mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
     
-    mpf_t f_aux, f_auxTwo;
-    mpf_inits(f_aux, f_auxTwo, NULL);
+    mpf_t f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo;
+    mpf_inits(f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo, f_aux, f_auxTwo, NULL);
     
-    mpf_set_d(f_aux, aux);
-    mpf_set_d(f_auxTwo, auxTwo);
+    mpf_set_ui(f_elems, _elems);
+    mpf_set_ui(f_n, num);
     
-    mpf_mul(f_aux, f_aux, f_auxTwo);
+    mpf_add_ui(f_aux, f_elems, 1);      //                   elems + 1
+    mpf_mul(f_aux, f_n, f_aux);         //              n * (elems + 1)
+    mpf_div_ui(f_aux, f_aux, 10);       //          ( ( n * (elems + 1) ) / 10 )
     
-    //double decil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 10 ) - k ) * ( x(k+1) - x(k) )
+    int k = (int) mpf_get_d(f_aux);     // k <- (int) ( ( n * (elems + 1) ) / 10 )
+    mpf_set_ui(f_k, k);
     
-    mpf_set_d(f_auxTwo, xk);
-    mpf_add(f_aux, f_aux, f_auxTwo);
+    mpf_set_d(f_xk, _collectorDatafile->getValueOrdered(k-1));
+    mpf_set_d(f_xk_next, _collectorDatafile->getValueOrdered(k));
     
+    mpf_sub(f_aux, f_aux, f_k);         //        ( ( ( n * (elems + 1) ) / 10 ) - k )
+    mpf_sub(f_auxTwo, f_xk_next, f_xk); //                                              ( x(k+1) - x(k) )
+    mpf_mul(f_aux, f_aux, f_auxTwo);    //        ( ( ( n * (elems + 1) ) / 10 ) - k ) * ( x(k+1) - x(k) )
+    mpf_add(f_aux, f_xk, f_aux);        // x(k) + ( ( ( n * (elems + 1) ) / 10 ) - k ) * ( x(k+1) - x(k) )
+
     double decil = mpf_get_d(f_aux);
-    mpf_clears(f_aux, f_auxTwo, NULL);
+    mpf_clears(f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo, NULL);
     
     return decil; // dummy
 }
@@ -308,32 +276,32 @@ double StatisticsDataFileDummyImpl::centil(unsigned short num) {
         throw std::invalid_argument("Value is not within bounds of this operation");
     }
     
-    // TODO sorted? if no then sort
-    
-    double aux = (num * (_elems + 1))/100;           //         ( n * (elems + 1) ) / 100
-    int k = (int) aux;
-    aux = aux - k;                                  //        ( ( n * (elems + 1) ) / 100 ) - k
-    double xk = _collectorDatafile->getValueOrdered(k-1);     // k-1 pois array comeca em zero
-    double xk_next = _collectorDatafile->getValueOrdered(k);
-    double auxTwo = xk_next - xk;                   //                                              ( x(k+1) - x(k) )
-    
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
     mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
     
-    mpf_t f_aux, f_auxTwo;
-    mpf_inits(f_aux, f_auxTwo, NULL);
+    mpf_t f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo;
+    mpf_inits(f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo, f_aux, f_auxTwo, NULL);
     
-    mpf_set_d(f_aux, aux);
-    mpf_set_d(f_auxTwo, auxTwo);
+    mpf_set_ui(f_elems, _elems);
+    mpf_set_ui(f_n, num);
     
-    mpf_mul(f_aux, f_aux, f_auxTwo);
+    mpf_add_ui(f_aux, f_elems, 1);      //                   elems + 1
+    mpf_mul(f_aux, f_n, f_aux);         //              n * (elems + 1)
+    mpf_div_ui(f_aux, f_aux, 100);      //          ( ( n * (elems + 1) ) / 100 )
     
-    //double centil = xk + (mpf_get_d(f_aux));       // x(k) + ( ( ( n * (elems + 1) ) / 100 ) - k ) * ( x(k+1) - x(k) )
+    int k = (int) mpf_get_d(f_aux);     // k <- (int) ( ( n * (elems + 1) ) / 100 )
+    mpf_set_ui(f_k, k);
     
-    mpf_set_d(f_auxTwo, xk);
-    mpf_add(f_aux, f_aux, f_auxTwo);
+    mpf_set_d(f_xk, _collectorDatafile->getValueOrdered(k-1));
+    mpf_set_d(f_xk_next, _collectorDatafile->getValueOrdered(k));
+    
+    mpf_sub(f_aux, f_aux, f_k);         //        ( ( ( n * (elems + 1) ) / 100 ) - k )
+    mpf_sub(f_auxTwo, f_xk_next, f_xk); //                                              ( x(k+1) - x(k) )
+    mpf_mul(f_aux, f_aux, f_auxTwo);    //        ( ( ( n * (elems + 1) ) / 100 ) - k ) * ( x(k+1) - x(k) )
+    mpf_add(f_aux, f_xk, f_aux);        // x(k) + ( ( ( n * (elems + 1) ) / 100 ) - k ) * ( x(k+1) - x(k) )
+
     double centil = mpf_get_d(f_aux);
-    mpf_clears(f_aux, f_auxTwo, NULL);
+    mpf_clears(f_xk, f_n, f_elems, f_k, f_xk_next, f_aux, f_auxTwo, NULL);
     
     return centil; // dummy
 }
@@ -376,6 +344,9 @@ double StatisticsDataFileDummyImpl::histogramClassLowerLimit(unsigned short clas
 
 unsigned int StatisticsDataFileDummyImpl::histogramClassFrequency(unsigned short classNum) {
     unsigned int count = 0;
+    if(classNum == histogramNumClasses()){
+        count++;
+    }
     double value;
     for(int i = 0; i < _elems; i++){
         value = _collectorDatafile->getValueOrdered(i);
@@ -412,28 +383,47 @@ void StatisticsDataFileDummyImpl::collectorAddHandler(double newValue){
     if(newValue < _min){
         _min = newValue;
     }
-    if(newValue> _max){
+    if(newValue > _max){
         _max = newValue;
     }
     
     _sum += newValue;
+    //_sumSquare += pow(newValue);
     
     mp_bitcnt_t z = mpf_get_default_prec(); // Variavel z contem a precisao default de float do GMP
     mpf_set_default_prec(z); // set a precisao com o valor default para esta instancia
     
-    mpf_t f_aux;
-    mpf_init(f_aux);
-    // _average = _sum / _elems;
-    mpf_set_d(f_aux, _sum);
-    mpf_div_ui(f_aux, f_aux, _elems);
-    _average = mpf_get_d(f_aux);
-    mpf_clear(f_aux);
+    mpf_t f_variance, f_elems, f_newValue, f_average, f_sumSquare, f_aux, f_auxTwo;
+    mpf_inits(f_variance, f_elems, f_newValue, f_average, f_sumSquare, f_aux, f_auxTwo, NULL);
     
-    _wasAltered_variance = true;
+    mpf_set_d(f_sumSquare, _sumSquare);
+    mpf_set_d(f_aux, newValue);
+    mpf_mul(f_auxTwo, f_aux, f_aux);
+    mpf_add(f_sumSquare, f_sumSquare, f_auxTwo);
+    
+    _sumSquare = mpf_get_d(f_sumSquare);
+    
+    // Calculo average: _average = _sum / _elems;
+    mpf_set_d(f_aux, _sum);
+    mpf_div_ui(f_average, f_aux, _elems);
+    _average = mpf_get_d(f_average);
+    
+    
+    // Calculo variance: _variance = _sumSquare / _elems - _average*_average;
+    mpf_set_ui(f_elems, _elems);
+    
+    mpf_div(f_aux, f_sumSquare, f_elems);      //             _sumSquare / _elems
+    mpf_mul(f_auxTwo, f_average, f_average);   //                                   _average*_average
+    mpf_sub(f_variance, f_aux, f_auxTwo);      // _variance = _sumSquare / _elems - _average*_average
+    
+    _variance = mpf_get_d(f_variance);         // _variance <- float _variance (possivel truncamento)
+    
+    // Clearing process
+    mpf_clears(f_variance, f_elems, f_newValue, f_average, f_aux, f_auxTwo, NULL);
+    
     _wasAltered_stddeviation = true;
     _wasAltered_variationCoef = true;
     _wasAltered_halfWidth = true;
-
 }
 
 void StatisticsDataFileDummyImpl::collectorClearHandler(){
@@ -450,7 +440,6 @@ void StatisticsDataFileDummyImpl::collectorClearHandler(){
     _halfWidth = 0.0;
     
     _histogramclassNum = 0;
-    _wasAltered_variance = false;
     _wasAltered_stddeviation = false;
     _wasAltered_variationCoef = false;
     _wasAltered_halfWidth = false;
